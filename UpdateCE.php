@@ -10,7 +10,7 @@ i18n_merge($UpdateCE) || i18n_merge($UpdateCE, 'en_US');
 register_plugin(
 	$UpdateCE,								# ID of plugin, should be filename minus php
 	i18n_r($UpdateCE.'/lang_Menu_Title'),	# Title of plugin
-	'1.0',									# Plugin version
+	'1.1',									# Plugin version
 	'CE Team',								# Plugin author
 	'https://getsimple-ce.ovh/donate',		# Author URL
 	i18n_r($UpdateCE.'/lang_Description'),	# Plugin Description
@@ -35,6 +35,7 @@ function update_ce() {
 	
 		<h3>'.i18n_r("UpdateCE/lang_Icon").i18n_r("UpdateCE/lang_Page_Title").' <small>(v'. $plugin_info['UpdateCE']['version'].')';
 		
+		// Check for update...
 		$db = file_get_contents('https://getsimplecms-ce.github.io/upgrade.json');
 		$jsondb = json_decode($db);
 		
@@ -48,6 +49,7 @@ function update_ce() {
 		<p>'.i18n_r("UpdateCE/lang_Description").'</p>';
 		
 		include(GSADMININCPATH ."configuration.php");
+		
 		echo  '<p class="w3-margin w3-round-medium w3-padding w3-light-green">'.i18n_r('UpdateCE/lang_Installed_Version') .': <span style="font-weight:600">'.$site_full_name. ' &ndash; '. $site_version_no.'</span>.</p>';
 		
 		if(isset($_GET['ok'])){
