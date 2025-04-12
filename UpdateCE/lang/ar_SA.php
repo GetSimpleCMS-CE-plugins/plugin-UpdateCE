@@ -13,7 +13,7 @@ $i18n = [
 	'lang_Installed_Version'	=>	'الإصدار المثبت',
 	'lang_Note'					=>	'ملاحظة',
 	'lang_Requirement'			=>	'الحد الأدنى المطلوب هو الإصدار v3.3.16.',
-	'lang_Create_Backup'		=>	'قم دائمًا بإنشاء نسخة احتياطية لحماية نفسك من المفاجآت!',
+	'lang_Create_Backup'		=>	'قم دائمًا بإنشاء نسخة احت<b><a class="w3-text-light w3-orange w3-round w3-padding" href="archive.php">ياطية لح</a></b>ماية نفسك من المفاجآت!',
 	'lang_Themes_Overwritten'	=>	'سيتم استبدال السمات <u>ResponsiveCE</u> و <u>W3-Startup</u>.',
 	'lang_Rename_Admin'			=>	'If you have renamed the default <b>/admin/</b> folder, this needs to be <u>reverted back before</u> applying this update. <br>After you have applied the update, you may again personalize this.',
 	
@@ -29,7 +29,7 @@ $i18n = [
 	
 	'lang_New_as_of'			=>	'جديد اعتبارًا من',
 	'lang_Plugin_MA'			=>	'الملحق "Massive Admin Theme" متضمن وقد يحتاج إلى التفعيل.',
-	'lang_Update_gsConfig'		=>	'إذا كنت تقوم بالتحديث من إصدار أقدم، فستحتاج إلى تحديث ملف "gsconfig.php" يدويًا بإضافة ما يلي...',
+	'lang_Update_gsConfig'		=>	'إذا كنت تقوم بالتحديث من إصدار أقدم، فستحتاج إلى تحديث ملف "<b>gsconfig.php</b>" يدويًا بإضافة ما يلي...',
 	'lang_Add_New'				=>	'إضافة جديد',
 	'lang_Replace_section'		=>	'استبدال القسم',
 	'lang_With_updated'			=>	'بالإصدار المحدث',

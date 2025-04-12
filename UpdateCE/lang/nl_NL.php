@@ -12,7 +12,7 @@ $i18n = [
 	'lang_Installed_Version'	=>	'Geïnstalleerde Versie',
 	'lang_Note'					=>	'Opmerking',
 	'lang_Requirement'			=>	'Minimale vereiste van v3.3.16.',
-	'lang_Create_Backup'		=>	'Maak altijd een back-up om jezelf te beschermen tegen het onverwachte!',
+	'lang_Create_Backup'		=>	'Maak altijd een <b><a class="w3-text-light w3-orange w3-round w3-padding" href="archive.php">back-up</a></b> om jezelf te beschermen tegen het onverwachte!',
 	'lang_Themes_Overwritten'	=>	'Thematische ResponsiveCE & W3-Startup zullen worden overschreven.',
 	'lang_Rename_Admin'			=>	'If you have renamed the default <b>/admin/</b> folder, this needs to be <u>reverted back before</u> applying this update. <br>After you have applied the update, you may again personalize this.',
 	
@@ -28,7 +28,7 @@ $i18n = [
 	
 	'lang_New_as_of'			=>	'Nieuw vanaf',
 	'lang_Plugin_MA'			=>	'De plugin "Massive Admin Theme" is inbegrepen en moet mogelijk worden geactiveerd.',
-	'lang_Update_gsConfig'		=>	'Als u bijwerkt vanaf een versie voor deze, moet u handmatig uw bestaande "gsconfig.php" bijwerken met het volgende...',
+	'lang_Update_gsConfig'		=>	'Als u bijwerkt vanaf een versie voor deze, moet u handmatig uw bestaande "<b>gsconfig.php</b>" bijwerken met het volgende...',
 	'lang_Add_New'				=>	'Voeg Nieuwe Toe',
 	'lang_Replace_section'		=>	'Vervang sectie',
 	'lang_With_updated'			=>	'Met bijgewerkte',
