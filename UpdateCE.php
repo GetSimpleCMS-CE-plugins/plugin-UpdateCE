@@ -182,7 +182,7 @@ function update_ce() {
 			<p>'.i18n_r('UpdateCE/lang_Add_New').':</p>
 			<div class="w3-codespan w3-padding w3-margin-bottom">
 # Login Page Default Language;<br>
-$LANG = \'en_EN\'; // es_ES, pl_PL, de_DE, uk_UK, etc.<br><br>
+$LANG = \'en_US\'; // es_ES, pl_PL, de_DE, uk_UK, etc.<br><br>
 
 # Sort admin page list by title or menu<br>
 define(\'GSSORTPAGELISTBY\',\'menu\');<br><br>
