@@ -1,0 +1,52 @@
+		<div class="w3-container w3-padding">
+			<h4 class=" w3-text-green w3-padding w3-pale-yellow" style="font-weight:600">
+			<svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 9a1 1 0 0 0-1 1v3a1 1 0 0 0 2 0v-3a1 1 0 0 0-1-1m7-7H5a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h11.59l3.7 3.71A1 1 0 0 0 21 22a.84.84 0 0 0 .38-.08A1 1 0 0 0 22 21V5a3 3 0 0 0-3-3m1 16.59l-2.29-2.3A1 1 0 0 0 17 16H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1ZM12 6a1 1 0 1 0 1 1a1 1 0 0 0-1-1"/></svg>
+			<span style="font-weight:600"> Info & Instructions:</span> 
+			<span class="w3-text-grey w3-right w3-small" style="padding-top:5px; font-weight:400;">Last updated: 2026-03-28 ( local )</span>
+			</h4>
+			
+			<ul class="w3-ul">
+				<li>
+					<p>Plugin "Massive Admin Theme" is included and may need to be activated.</p>
+				</li>
+				<li>
+					<p>If you are updating from a version prior to this, you will need to manually update your existing "<b>gsconfig.php</b>" with the following...</p>
+				</li>
+			</ul>
+		
+			<p>Add New:</p>
+			<div class="w3-codespan w3-padding w3-margin-bottom">
+# Login Page Default Language;<br>
+$LANG = 'en_US'; // es_ES, pl_PL, de_DE, uk_UK, etc.<br><br>
+
+# Sort admin page list by title or menu<br>
+define('GSSORTPAGELISTBY','menu');<br><br>
+
+# Set CodeMirror Theme (blackboard or default)<br>
+define('GSCMTHEME','blackboard');
+			</div>
+		
+			<p>Replace section:</p>
+			<div class="w3-codespan w3-padding  w3-margin-bottom">
+# WYSIWYG toolbars (advanced, basic or [custom config]) <br>
+# define('GSEDITORTOOL', 'advanced');<br><br>
+
+# WYSIWYG Editor Options<br>
+# define('GSEDITOROPTIONS', '');
+			</div>
+		
+			<p>With updated:</p>
+			<div class="w3-codespan w3-padding  w3-margin-bottom">
+# WYSIWYG toolbars (advanced, basic, CEbar, island or [custom config])<br>
+define('GSEDITORTOOL', "CEbar");<br><br>
+
+# WYSIWYG Editor Options<br>
+define('GSEDITOROPTIONS', '<br>
+extraPlugins:"fontawesome5,youtube,codemirror,cmsgrid,colorbutton,oembed,simplebutton,spacingsliders",<br>
+disableNativeSpellChecker : false,<br>
+forcePasteAsPlainText : true<br>
+');
+
+			</div>
+			
+		</div>
