@@ -340,14 +340,6 @@ echo '
 			'woff','woff2','ttf','eot','otf',
 			'zip','gz','map'
 		];
-		
-		$basename = basename($destinationPath);
-		$ext      = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
-
-		if ($basename !== '.htaccess' && !in_array($ext, $allowedExtensions, true)) {
-			echo "Skipped disallowed file type: " . htmlspecialchars($relativePath, ENT_QUOTES, 'UTF-8') . "<br>";
-			continue;
-		}
 
 		$zip = new ZipArchive;
 		if ($zip->open($tmpFile) === TRUE) {
@@ -410,8 +402,9 @@ echo '
 						}
 					} else {
 						// --- Extension allowlist: block unexpected file types ---
-						$ext = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
-						if (!in_array($ext, $allowedExtensions, true)) {
+						$basename = basename($destinationPath);
+						$ext      = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
+						if ($basename !== '.htaccess' && !in_array($ext, $allowedExtensions, true)) {
 							echo "Skipped disallowed file type: " . htmlspecialchars($relativePath, ENT_QUOTES, 'UTF-8') . "<br>";
 							continue;
 						}
