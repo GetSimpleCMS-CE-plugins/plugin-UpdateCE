@@ -10,7 +10,7 @@ i18n_merge($UpdateCE) || i18n_merge($UpdateCE, 'en_US');
 register_plugin(
 	$UpdateCE,								# ID of plugin, should be filename minus php
 	i18n_r($UpdateCE.'/lang_Menu_Title'),	# Title of plugin
-	'1.4',									# Plugin version
+	'1.5',									# Plugin version
 	'CE Team',								# Plugin author
 	'https://getsimple-ce.ovh/donate',		# Author URL
 	i18n_r($UpdateCE.'/lang_Description'),	# Plugin Description
@@ -127,7 +127,8 @@ function update_ce() {
 					<footer class="w3-container w3-light-gray">
 						<form action="'.$SITEURL.'admin/load.php?id=UpdateCE&&ok=ok" method="POST">
 							<div class="w3-margin w3-center">
-								<input type="hidden" name="url" value="' . $value->url . '">
+								<input type="hidden" name="url" value="' . htmlspecialchars($value->url, ENT_QUOTES, 'UTF-8') . '">
+								<input type="hidden" name="updatece_nonce" value="' . get_nonce('updatece_download') . '">
 								<button class="w3-btn w3-large w3-round w3-green" type="submit" name="download"><svg xmlns="http://www.w3.org/2000/svg" style="vertical-align:middle" width="1.2em" height="1.2em" viewBox="0 0 36 36"><path fill="currentColor" d="M19.5 28.1h-2.9c-.5 0-.9-.3-1-.8l-.5-1.8l-.4-.2l-1.6.9c-.4.2-.9.2-1.2-.2l-2.1-2.1c-.3-.3-.4-.8-.2-1.2l.9-1.6l-.2-.4l-1.8-.5c-.4-.1-.8-.5-.8-1v-2.9c0-.5.3-.9.8-1l1.8-.5l.2-.4l-.9-1.6c-.2-.4-.2-.9.2-1.2l2.1-2.1c.3-.3.8-.4 1.2-.2l1.6.9l.4-.2l.5-1.8c.1-.4.5-.8 1-.8h2.9c.5 0 .9.3 1 .8L21 10l.4.2l1.6-.9c.4-.2.9-.2 1.2.2l2.1 2.1c.3.3.4.8.2 1.2l-.9 1.6l.2.4l1.8.5c.4.1.8.5.8 1v2.9c0 .5-.3.9-.8 1l-1.8.5l-.2.4l.9 1.6c.2.4.2.9-.2 1.2L24.2 26c-.3.3-.8.4-1.2.2l-1.6-.9l-.4.2l-.5 1.8c-.2.5-.6.8-1 .8m-2.2-2h1.4l.5-2.1l.5-.2c.4-.1.7-.3 1.1-.4l.5-.3l1.9 1.1l1-1l-1.1-1.9l.3-.5c.2-.3.3-.7.4-1.1l.2-.5l2.1-.5v-1.4l-2.1-.5l-.2-.5c-.1-.4-.3-.7-.4-1.1l-.3-.5l1.1-1.9l-1-1l-1.9 1.1l-.5-.3c-.3-.2-.7-.3-1.1-.4l-.5-.2l-.5-2.1h-1.4l-.5 2.1l-.5.2c-.4.1-.7.3-1.1.4l-.5.3l-1.9-1.1l-1 1l1.1 1.9l-.3.5c-.2.3-.3.7-.4 1.1l-.2.5l-2.1.5v1.4l2.1.5l.2.5c.1.4.3.7.4 1.1l.3.5l-1.1 1.9l1 1l1.9-1.1l.5.3c.3.2.7.3 1.1.4l.5.2zm9.8-6.6"/><path fill="currentColor" d="M18 22.3c-2.4 0-4.3-1.9-4.3-4.3s1.9-4.3 4.3-4.3s4.3 1.9 4.3 4.3s-1.9 4.3-4.3 4.3m0-6.6c-1.3 0-2.3 1-2.3 2.3s1 2.3 2.3 2.3s2.3-1 2.3-2.3s-1-2.3-2.3-2.3"/><path fill="currentColor" d="M18 2c-.6 0-1 .4-1 1s.4 1 1 1c7.7 0 14 6.3 14 14s-6.3 14-14 14S4 25.7 4 18c0-2.8.8-5.5 2.4-7.8v1.2c0 .6.4 1 1 1s1-.4 1-1v-5h-5c-.6 0-1 .4-1 1s.4 1 1 1h1.8C3.1 11.1 2 14.5 2 18c0 8.8 7.2 16 16 16s16-7.2 16-16S26.8 2 18 2"/><path fill="none" d="M0 0h36v36H0z"/></svg> '.i18n_r('UpdateCE/lang_Update_Now').'</button>
 							</div>
 						</form>
@@ -288,18 +289,42 @@ echo '
 	';
 
 	if (isset($_POST['download'])) {
+
+		// --- CSRF verification (Vuln 4) ---
+		if (empty($_POST['updatece_nonce']) || !verify_nonce('updatece_download', $_POST['updatece_nonce'])) {
+			echo "Security check failed. Please reload the page and try again.";
+			return;
+		}
+
+		// --- SSRF: enforce GitHub/GetSimpleCMS-CE origin allowlist (Vuln 2) ---
 		$url = filter_var($_POST['url'], FILTER_VALIDATE_URL);
 		if ($url === false) {
 			echo "Invalid URL.";
 			return;
 		}
+		$parsedUrl = parse_url($url);
+		if (
+			empty($parsedUrl['scheme']) || strtolower($parsedUrl['scheme']) !== 'https' ||
+			empty($parsedUrl['host'])   || strtolower($parsedUrl['host'])   !== 'github.com' ||
+			empty($parsedUrl['path'])   || strpos($parsedUrl['path'], '/GetSimpleCMS-CE/') !== 0
+		) {
+			echo "URL is not from an allowed source.";
+			return;
+		}
 
 		$rootPath = dirname(GSDATAPATH);
-		$tmpFile = $rootPath . "/Tmpfile.zip";
+		$tmpFile  = $rootPath . "/Tmpfile.zip";
 
-		$fileContent = @file_get_contents($url);
+		$context     = stream_context_create(['http' => ['timeout' => 15]]);
+		$fileContent = @file_get_contents($url, false, $context);
 		if ($fileContent === false) {
 			echo "Failed to download file.";
+			return;
+		}
+
+		// --- Magic-byte validation: must be a ZIP (PK\x03\x04) ---
+		if (strlen($fileContent) < 4 || substr($fileContent, 0, 4) !== "PK\x03\x04") {
+			echo "Downloaded file is not a valid ZIP archive.";
 			return;
 		}
 
@@ -308,11 +333,39 @@ echo '
 			return;
 		}
 
+		// Allowed file extensions that may be written to the webroot (Vuln 3)
+		$allowedExtensions = [
+			'php','js','css','html','htm','xml','json','txt','md',
+			'png','jpg','jpeg','gif','webp','svg','ico',
+			'woff','woff2','ttf','eot','otf',
+			'zip','gz','map'
+		];
+		
+		$basename = basename($destinationPath);
+		$ext      = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
+
+		if ($basename !== '.htaccess' && !in_array($ext, $allowedExtensions, true)) {
+			echo "Skipped disallowed file type: " . htmlspecialchars($relativePath, ENT_QUOTES, 'UTF-8') . "<br>";
+			continue;
+		}
+
 		$zip = new ZipArchive;
 		if ($zip->open($tmpFile) === TRUE) {
 			$installTmp = $rootPath . "/install_TMP/";
 			if (!file_exists($installTmp)) {
 				mkdir($installTmp, 0755);
+			}
+
+			// --- Zip-slip: pre-validate every entry before extraction (Vuln 3) ---
+			$realInstallTmp = realpath($installTmp) . DIRECTORY_SEPARATOR;
+			for ($i = 0; $i < $zip->numFiles; $i++) {
+				$entryName  = $zip->getNameIndex($i);
+				$normalised = $realInstallTmp . ltrim(str_replace(['\\', '../'], ['/', ''], $entryName), '/');
+				if (strpos($normalised, $realInstallTmp) !== 0) {
+					$zip->close();
+					echo "ZIP archive contains unsafe path: " . htmlspecialchars($entryName, ENT_QUOTES, 'UTF-8');
+					return;
+				}
 			}
 
 			$zip->extractTo($installTmp);
@@ -335,10 +388,20 @@ echo '
 				$directoryIterator = new RecursiveDirectoryIterator($subFolder, RecursiveDirectoryIterator::SKIP_DOTS);
 				$iterator = new RecursiveIteratorIterator($directoryIterator, RecursiveIteratorIterator::SELF_FIRST);
 
+				$realRoot = realpath($rootPath) . DIRECTORY_SEPARATOR;
+
 				foreach ($iterator as $file) {
-					$sourcePath = $file->getPathname();
-					$relativePath = substr($sourcePath, strlen($subFolder));
+					$sourcePath      = $file->getPathname();
+					$relativePath    = substr($sourcePath, strlen($subFolder));
 					$destinationPath = $rootPath . '/' . $relativePath;
+
+					// --- Secondary zip-slip guard on resolved destination ---
+					$resolvedParent = realpath(dirname($destinationPath));
+					if ($resolvedParent === false || strpos($resolvedParent . DIRECTORY_SEPARATOR, $realRoot) !== 0) {
+						echo "Blocked unsafe path: " . htmlspecialchars($relativePath, ENT_QUOTES, 'UTF-8') . "<br>";
+						$filesCopied = false;
+						continue;
+					}
 
 					if ($file->isDir()) {
 						if (!file_exists($destinationPath) && !mkdir($destinationPath, 0755, true)) {
@@ -346,6 +409,13 @@ echo '
 							$filesCopied = false;
 						}
 					} else {
+						// --- Extension allowlist: block unexpected file types ---
+						$ext = strtolower(pathinfo($destinationPath, PATHINFO_EXTENSION));
+						if (!in_array($ext, $allowedExtensions, true)) {
+							echo "Skipped disallowed file type: " . htmlspecialchars($relativePath, ENT_QUOTES, 'UTF-8') . "<br>";
+							continue;
+						}
+
 						if (!copy($sourcePath, $destinationPath)) {
 							$lastError = error_get_last();
 							echo "Failed to copy $sourcePath to $destinationPath: " . $lastError['message'] . "<br>";
